@@ -1,0 +1,9 @@
+streamlit
+groq
+pdfplumber
+playwright
+beautifulsoup4
+lxml
+youtube-transcript-api
+pytesseract
+pillow
