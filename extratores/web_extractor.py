@@ -151,32 +151,38 @@ class WebExtractor:
             # Chama a função cacheada pelo Streamlit (Evita Playwright se já passamos por aqui recentemente)
             html = extrair_html_cacheado(url)
 
-            # Processador HTML (Limpeza)
+            # Processador HTML (Limpeza Profunda)
             soup = BeautifulSoup(html, "lxml")
 
-            # Remover o lixo estrutural, mas preservar a espinha dorsal
-            for invalid_tag in soup(["script", "style", "noscript", "svg", "header", "footer", "nav", "aside", "form", "button", "path"]):
+            # 1. Destruir sumariamente tags de sujeira, menus escondidos e scripts para economizar os 25k caracteres
+            tags_para_remover = [
+                "script", "style", "noscript", "svg", "header", "footer", "nav", 
+                "aside", "form", "button", "path", "meta", "link", "head", "iframe", "dialog"
+            ]
+            for invalid_tag in soup(tags_para_remover):
                 invalid_tag.decompose()
             
-            # Pegar o texto limpo, mas agora preservando atributos principais como os LINKS
-            # Para redes sociais (YouTube/Twitter) ou E-commerce o link do produto/canal é crucial
-            texto_linhas = []
-            for element in soup.descendants:
-                if element.name == "a" and element.has_attr("href"):
-                    link_text = element.get_text(strip=True)
-                    if link_text:
-                        texto_linhas.append(f"{link_text} [Link: {element['href']}]")
-                elif hasattr(element, "text") and element.name not in ["a"]:
-                        # pega texto puro (String) solto nas divs
-                        if isinstance(element, str) and element.strip():
-                            texto_linhas.append(element.strip())
+            # 2. Truque de Mestre: Converter os links <a> em texto puro anotado inline
+            # Assim não perdemos o href quando rodarmos o get_text final
+            for a_tag in soup.find_all("a", href=True):
+                txt = a_tag.get_text(strip=True)
+                href = a_tag["href"]
+                # Ignorar links inúteis ou vazios
+                if txt and href and not href.startswith("javascript:"):
+                    a_tag.string = f"{txt} [Link: {href}]"
             
-            texto_limpo = "\n".join(texto_linhas)
+            # 3. Extrair texto super limpo apenas do body (ignorando o DOM e as tags HTML)
+            if soup.body:
+                texto_limpo = soup.body.get_text(separator='\n', strip=True)
+            else:
+                texto_limpo = soup.get_text(separator='\n', strip=True)
             
-            # Compressão anti-quebra (remover quebra de linhas duplas)
-            while "\n\n" in texto_limpo:
-                texto_limpo = texto_limpo.replace("\n\n", "\n")
+            # 4. Compressão vertical extrema (remover múltiplas quebras de linhas)
+            # Isso junta as linhas de um mesmo produto fazendo-o caber fácil no limite do LLM
+            linhas = [linha.strip() for linha in texto_limpo.split('\n') if linha.strip()]
+            texto_limpo = '\n'.join(linhas)
             
+            # Retorna o suco condensado da informação
             return texto_limpo
         except Exception as e:
             tb = traceback.format_exc()
