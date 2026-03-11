@@ -41,14 +41,15 @@ class ExtractionEngine:
         REGRAS IMPORTANTES DE EXTRAÇÃO E FILTRAGEM:
         1. Baseie-se APENAS no texto-fonte. Não invente informações!
         2. ATENÇÃO AO FILTRO: Se o usuário pediu por um item específico nas "INSTRUÇÕES DE FILTRO", VOCÊ DEVE OBRIGATORIAMENTE FILTRAR E IGNORAR todos os outros itens.
-        3. EXTRAÇÃO GRANULAR / TABELAS: Se o texto for um relatório financeiro, extrato ou tabela com múltiplas linhas, VOCÊ DEVE EXTRAIR CADA LINHA INDIVIDUALMENTE como um item separado do JSON. NÃO resuma nada! Queremos a lista estrita de itens.
-        4. TOTAIS NO FINAL: Após listar as linhas individuais, se houver um "Total" ou "Saldo", inclua ele na lista JSON como se fosse a última linha extraída.
-        5. LIMPEZA DE NÚMEROS E PORCENTAGENS: Ao extrair Valores monetários, Porcentagens, Taxas ou Totais, escreva APENAS OS NÚMEROS PUROS com pontuação decimal (ex: 98.36, 10000.00, -150.50). NUNCA escreva palavras, letras, descrições ou símbolos (como "%", "R$", "Total") dentro de campos que deveriam ser puramente matemáticos!
-        6. HERANÇA DE CONTEXTO: Em PDFs, blocos como "Categoria" ou "Item Pai" muitas vezes aparecem só na primeira linha. Se você extrair uma sub-linha e a categoria/nome dela estiver em branco no PDF, PREENCHA o JSON herdando e copiando a informação da linha de cima que pertence ao mesmo bloco de gastos.
-        7. A raiz do seu JSON DEVE conter OBRIGATORIAMENTE uma única chave chamada "itens", contendo uma LISTA de objetos contendo os campos solicitados pelo usuário listados acima.
-        8. O formato de resposta OBRIGATÓRIO é um JSON perfeitamente válido contendo apenas o objeto {{"itens": [...]}}. 
-        9. Lembre-se que o site extraído tem formatação rústica. Extraia urls limpas!
-        10. Se as informações não estiverem no texto, retorne {{"itens": []}}. NUNCA escreva nada fora do JSON bruto.
+        3. INTELIGÊNCIA DE COLUNAS: O usuário pode digitar pedidos conversacionais ou confusos para os "CAMPOS A EXTRAIR" (ex: "tabela de finanças, total, despesas"). NÃO crie nomes de colunas literais bizarros como "tabela_de_financas" que englobem a tabela inteira! Em vez disso, DEDUZA AS COLUNAS LÓGICAS (ex: "Data", "Descrição", "Valor") que melhor representam o que o usuário quer ver.
+        4. EXTRAÇÃO GRANULAR / TABELAS: Se o texto for um relatório financeiro, extrato ou tabela com múltiplas linhas, VOCÊ DEVE EXTRAIR CADA LINHA INDIVIDUALMENTE como um item separado do JSON. NÃO resuma nada! Queremos a lista estrita de itens.
+        5. TOTAIS NO FINAL: Após listar as linhas individuais, se houver um "Total" ou "Saldo", inclua ele na lista JSON como se fosse a última linha extraída. Não tente preencher o valor Total em todas as linhas filhas. O total é apenas a última linha.
+        6. LIMPEZA DE NÚMEROS E PORCENTAGENS: Ao extrair Valores monetários, Porcentagens, Taxas ou Totais, escreva APENAS OS NÚMEROS PUROS com pontuação decimal (ex: 98.36, 10000.00, -150.50). NUNCA escreva palavras, letras, descrições ou símbolos (como "%", "R$", "Total") dentro de campos que deveriam ser puramente matemáticos!
+        7. HERANÇA DE CONTEXTO: Em PDFs, blocos como "Categoria" ou "Item Pai" muitas vezes aparecem só na primeira linha. Se você extrair uma sub-linha e a categoria/nome dela estiver em branco no PDF, PREENCHA o JSON herdando e copiando a informação da linha de cima que pertence ao mesmo bloco de gastos.
+        8. A raiz do seu JSON DEVE conter OBRIGATORIAMENTE uma única chave chamada "itens", contendo uma LISTA de objetos contendo os campos solicitados pelo usuário listados acima.
+        9. O formato de resposta OBRIGATÓRIO é um JSON perfeitamente válido contendo apenas o objeto {{"itens": [...]}}. 
+        10. Lembre-se que o site extraído tem formatação rústica. Extraia urls limpas!
+        11. Se as informações não estiverem no texto, retorne {{"itens": []}}. NUNCA escreva nada fora do JSON bruto.
 
         TEXTO-FONTE:
         {text_preview}
