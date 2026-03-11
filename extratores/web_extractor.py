@@ -22,15 +22,13 @@ def extrair_html_cacheado(url: str) -> str:
     # ==========================================
     try:
         with sync_playwright() as p:
-            # Navegador invisível carregando o site de forma furtiva (stealth)
-            browser = p.chromium.launch(
+            # ATUALIZAÇÃO ANTI-BOT: Mudando de Chromium para Firefox
+            # O Firefox headless é nativamente menos rastreado por WAFs como Datadome e Cloudflare
+            browser = p.firefox.launch(
                 headless=True, 
                 args=[
-                    "--disable-blink-features=AutomationControlled", 
-                    "--no-sandbox",
-                    "--disable-dev-shm-usage", # Evita o crash de memória compartilhada no Docker do Hugging Face
-                    "--disable-gpu",           # Essencial para servidores Linux na nuvem
-                    "--window-size=1920,1080"
+                    "--width=1920",
+                    "--height=1080"
                 ]
             )
             
