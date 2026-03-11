@@ -251,6 +251,11 @@ with col2:
 
     if st.session_state.resultados:
         df = pd.DataFrame(st.session_state.resultados)
+        
+        # Limpar os artefatos visuais de dados vazios (trocar "None" e nulos por espaço em branco)
+        df.fillna("", inplace=True)
+        df.replace("None", "", inplace=True)
+        
         st.dataframe(df, use_container_width=True)
         
         st.divider()
