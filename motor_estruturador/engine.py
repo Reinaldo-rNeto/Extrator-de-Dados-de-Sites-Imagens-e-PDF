@@ -54,36 +54,48 @@ class ExtractionEngine:
 
         try:
             chat_completion = self.client.chat.completions.create(
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt,
-                    }
-                ],
+                messages=[{"role": "user", "content": prompt}],
                 model=self.model,
-                # Força o Llama a retornar um JSON estruturado em vez de conversa normal
                 response_format={"type": "json_object"},
             )
-            
             res_text = chat_completion.choices[0].message.content
-            
             return json.loads(res_text.strip()), foi_cortado
             
-        except json.JSONDecodeError:
-            print(f"Erro de JSON. Salvando o que foi gerado. Resposta bruta: {res_text}")
-            # Tenta salvar um JSON cortado pela metade (Comum ao extrair muitas páginas e bater o limite)
-            try:
-                last_brace = res_text.rfind('}')
-                if last_brace != -1:
-                    salvaged_text = res_text[:last_brace+1] + ']}'
-                    return json.loads(salvaged_text), True
-            except:
-                pass
-            
-            return {"erro": "A IA foi interrompida antes de terminar a lista. O arquivo é muito denso! Tente extrair apenas 1 ou 2 páginas por vez."}, foi_cortado
         except Exception as e:
+            error_msg = str(e)
+            # Se bater o limite diário do modelo 70B (Genius), faz Fallback Automático pro modelo 8B (Fast)
+            if 'rate_limit_exceeded' in error_msg or '429' in error_msg:
+                print("Limite do Llama 70B Atingido. Tentando Fallback para Llama 8B...")
+                try:
+                    fallback_completion = self.client.chat.completions.create(
+                        messages=[{"role": "user", "content": prompt}],
+                        model="llama3-8b-8192", # Modelo mais leve, possui cota diária separada
+                        response_format={"type": "json_object"},
+                    )
+                    res_text = fallback_completion.choices[0].message.content
+                    return json.loads(res_text.strip()), foi_cortado
+                except json.JSONDecodeError:
+                    return self._tenta_salvar_json_quebrado(res_text, foi_cortado)
+                except Exception as fallback_e:
+                    return {"erro": f"Cota de Inteligência Esgotada em todos os modelos. Detalhe: {fallback_e}"}, foi_cortado
+            
+            # Se for apenas um erro de JSON na primeira tentativa
+            if 'json.decoder.JSONDecodeError' in str(type(e)) or 'Expecting value' in error_msg:
+                return self._tenta_salvar_json_quebrado(res_text if 'res_text' in locals() else "", foi_cortado)
+                
             print(f"Erro na comunicação com a API: {e}")
             return {"erro": str(e)}, foi_cortado
+
+    def _tenta_salvar_json_quebrado(self, res_text: str, foi_cortado: bool):
+        print(f"Erro de JSON. Salvando o que foi gerado. Resposta bruta: {res_text}")
+        try:
+            last_brace = res_text.rfind('}')
+            if last_brace != -1:
+                salvaged_text = res_text[:last_brace+1] + ']}'
+                return json.loads(salvaged_text), True
+        except:
+            pass
+        return {"erro": "A IA foi interrompida antes de terminar a lista. O arquivo é muito denso! Tente extrair apenas 1 ou 2 páginas por vez."}, foi_cortado
 
 if __name__ == "__main__":
     print("Motor Inicializado.")
