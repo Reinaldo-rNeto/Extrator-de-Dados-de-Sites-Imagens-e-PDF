@@ -256,7 +256,9 @@ with col2:
         df.fillna("", inplace=True)
         df.replace("None", "", inplace=True)
         
-        st.dataframe(df, use_container_width=True)
+        # use_container_width como "False" obriga a tabela a gerar uma barra de rolagem lateral 
+        # caso as colunas extraídas (Data, Categoria, etc) sejam maiores que a tela do usuário.
+        st.dataframe(df, use_container_width=False, height=500, width=2000)
         
         st.divider()
         
