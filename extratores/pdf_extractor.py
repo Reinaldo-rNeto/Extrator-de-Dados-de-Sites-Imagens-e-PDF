@@ -1,5 +1,6 @@
 import pdfplumber
 import os
+import re
 
 class PDFExtractor:
     """
@@ -30,6 +31,9 @@ class PDFExtractor:
                     # Ele mantém os espaços e tabulações entre a "Descrição" e o "Valor" nas colunas.
                     texto_pagina = page.extract_text(layout=True)
                     if texto_pagina:
+                        # Otimização de Memória: Troca grandes vácuos de espaço por apenas 3 espaços.
+                        # Isso mantém o visual de colunas para a IA sem estourar o limite de Tokens (12k).
+                        texto_pagina = re.sub(r' {4,}', '   ', texto_pagina)
                         texto_completo.append(texto_pagina)
             
             return "\n".join(texto_completo)

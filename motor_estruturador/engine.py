@@ -70,8 +70,17 @@ class ExtractionEngine:
             return json.loads(res_text.strip()), foi_cortado
             
         except json.JSONDecodeError:
-            print(f"Erro ao converter a resposta da IA para JSON. Resposta bruta: {res_text}")
-            return {"erro": "A IA não retornou um formato estruturado válido."}, foi_cortado
+            print(f"Erro de JSON. Salvando o que foi gerado. Resposta bruta: {res_text}")
+            # Tenta salvar um JSON cortado pela metade (Comum ao extrair muitas páginas e bater o limite)
+            try:
+                last_brace = res_text.rfind('}')
+                if last_brace != -1:
+                    salvaged_text = res_text[:last_brace+1] + ']}'
+                    return json.loads(salvaged_text), True
+            except:
+                pass
+            
+            return {"erro": "A IA foi interrompida antes de terminar a lista. O arquivo é muito denso! Tente extrair apenas 1 ou 2 páginas por vez."}, foi_cortado
         except Exception as e:
             print(f"Erro na comunicação com a API: {e}")
             return {"erro": str(e)}, foi_cortado
