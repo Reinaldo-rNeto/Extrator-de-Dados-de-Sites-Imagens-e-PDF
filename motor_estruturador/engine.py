@@ -34,14 +34,14 @@ class ExtractionEngine:
 
         CAMPOS A EXTRAIR: {', '.join(target_fields)}
         
-        INSTRUÇÕES DE FILTRO OU CONTEXTO DO USUÁRIO: {custom_context if custom_context else "Nenhuma (Extrair todos os itens correspondentes encontrados)."}
+        INSTRUÇÕES DE FILTRO OU CONTEXTO DO USUÁRIO: {custom_context if custom_context else "Nenhuma instrução específica."}
 
-        REGRAS IMPORTANTES:
-        1. Baseie-se APENAS no texto-fonte. Não invente informações! E obedeça estritamente às INSTRUÇÕES DE FILTRO acima.
-        2. Se houver vários itens do mesmo tipo na página (ex: dezenas de produtos numa loja), a raiz do seu JSON DEVE conter uma única chave chamada "itens", contendo uma LISTA de objetos. (Exemplo: {{"itens": [{{"nome": "A", "preco": "10"}}, {{"nome": "B", "preco": "20"}}]}}).
-        3. Se houver apenas um item, retorne da mesma forma na lista: {{"itens": [...]}}
-        4. Se as informações não estiverem no texto, retorne {{"itens": []}} (lista vazia).
-        5. Formato de resposta OBRIGATÓRIO: JSON perfeitamente válido contendo apenas o objeto {{"itens": [...]}}. Não escreva absolutamente NADA fora do JSON.
+        REGRAS IMPORTANTES DE EXTRAÇÃO E FILTRAGEM:
+        1. Baseie-se APENAS no texto-fonte. Não invente informações!
+        2. ATENÇÃO AO FILTRO: Se o usuário pediu por um item específico nas "INSTRUÇÕES DE FILTRO" (exemplo: "apenas TV", "apenas tênis", "somente empresas de SP"), VOCÊ DEVE OBRIGATORIAMENTE FILTRAR E IGNORAR todos os outros itens da página que não sejam do tipo solicitado. Use interpretação semântica (uma "televisão" é uma "TV").
+        3. Se houver vários itens correspondentes na página (ex: dezenas de produtos numa loja), a raiz do seu JSON DEVE conter uma única chave chamada "itens", contendo uma LISTA de objetos. (Exemplo: {{"itens": [{{"nome": "A", "preco": "10"}}, {{"nome": "B", "preco": "20"}}]}}).
+        4. O formato de resposta OBRIGATÓRIO é um JSON perfeitamente válido contendo apenas o objeto {{"itens": [...]}}. 
+        5. Se as informações não estiverem no texto ou nenhum item passar no filtro do usuário, retorne estritamente {{"itens": []}} (lista vazia). Não escreva absolutamente NADA fora do JSON bruto.
 
         TEXTO-FONTE:
         {text_preview}
