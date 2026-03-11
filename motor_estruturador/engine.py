@@ -69,7 +69,7 @@ class ExtractionEngine:
                 try:
                     fallback_completion = self.client.chat.completions.create(
                         messages=[{"role": "user", "content": prompt}],
-                        model="llama3-8b-8192", # Modelo mais leve, possui cota diária separada
+                        model="llama-3.1-8b-instant", # Modelo Llama 3.1 mais leve, possui cota diária separada
                         response_format={"type": "json_object"},
                     )
                     res_text = fallback_completion.choices[0].message.content
