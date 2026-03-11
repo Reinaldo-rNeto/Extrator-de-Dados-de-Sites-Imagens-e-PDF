@@ -1,3 +1,13 @@
+---
+title: Extrator De Dados
+emoji: 🦀
+colorFrom: blue
+colorTo: red
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 <div align="center">
   <h1>✨ Extrator de Dados IA Premium</h1>
   <p><strong>Transforme dados confusos de Sites, PDFs e Imagens em Tabelas Estruturadas via Inteligência Artificial!</strong></p>
