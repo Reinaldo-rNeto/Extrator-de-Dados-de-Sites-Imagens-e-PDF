@@ -104,8 +104,19 @@ with col1:
     arquivo_upload = None
     url_input = None
     
+    pag_inicial = 1
+    pag_final = None
+
     if fonte_tipo == "📁 Arquivos Locais (PDF / Imagem)":
         arquivo_upload = st.file_uploader("Selecione um Arquivo PDF ou Fotografia da sua máquina", type=["pdf", "png", "jpg", "jpeg"])
+        
+        if arquivo_upload and arquivo_upload.name.lower().endswith(".pdf"):
+            st.markdown("**Intervalo de Páginas (Para PDFs ou Relatórios)**")
+            cp1, cp2 = st.columns(2)
+            pag_inicial = cp1.number_input("Página Inicial", min_value=1, value=1)
+            pag_final_input = cp2.number_input("Página Final", min_value=1, value=3, help="A IA lê cerca de 3 a 5 páginas por vez devido ao limite de memória.")
+            pag_final = pag_final_input
+            
     else:
         url_input = st.text_input("Digite o link da página (Ex: https://lista.mercadolivre.com.br/...)")
 
@@ -166,7 +177,7 @@ with col2:
                             tmp_path = tmp.name
                         
                         if file_ext == ".pdf":
-                            texto_bruto = pdf_extractor.extract_text(tmp_path)
+                            texto_bruto = pdf_extractor.extract_text(tmp_path, start_page=pag_inicial, end_page=pag_final)
                         elif file_ext in [".png", ".jpg", ".jpeg"]:
                             texto_bruto = img_extractor.extract_text(tmp_path)
                             if texto_bruto == "erro_ocr_nao_instalado":
