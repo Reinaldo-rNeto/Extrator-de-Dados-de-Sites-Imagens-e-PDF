@@ -40,12 +40,13 @@ class ExtractionEngine:
 
         REGRAS IMPORTANTES DE EXTRAÇÃO E FILTRAGEM:
         1. Baseie-se APENAS no texto-fonte. Não invente informações!
-        2. ATENÇÃO AO FILTRO: Se o usuário pediu por um item específico nas "INSTRUÇÕES DE FILTRO" (exemplo: "apenas TV", "celular", "somente empresas de SP"), VOCÊ DEVE OBRIGATORIAMENTE FILTRAR E IGNORAR todos os outros itens da página que não sejam do tipo solicitado. Use inteligência para abstrair (uma "televisão" é uma "TV", "smartphone" é "celular").
-        3. Se houver vários itens correspondentes na página, a raiz do seu JSON DEVE conter uma única chave chamada "itens", contendo uma LISTA de objetos. (Exemplo: {{"itens": [{{"nome": "A", "preco": "10", "link": "http..."}}, {{"nome": "B", "preco": "20"}}]}}).
-        4. O formato de resposta OBRIGATÓRIO é um JSON perfeitamente válido contendo apenas o objeto {{"itens": [...]}}. 
-        5. Lembre-se que o site extraído tem formatação rústica (os links aparecem assim: "[Link: http...]"). Extraia urls limpas!
-        6. IMPORTANTE: Leia todo o texto-fonte passado até a última linha antes de dizer que não encontrou nada!
-        7. Se as informações não estiverem no texto ou nenhum item passar no filtro do usuário apóes a LEITURA TOTAL, retorne estritamente {{"itens": []}} (lista vazia). Não escreva NADA fora do JSON bruto.
+        2. ATENÇÃO AO FILTRO: Se o usuário pediu por um item específico nas "INSTRUÇÕES DE FILTRO" (exemplo: "apenas TV", "celular", "somente empresas de SP"), VOCÊ DEVE OBRIGATORIAMENTE FILTRAR E IGNORAR todos os outros itens.
+        3. EXTRAÇÃO GRANULAR / TABELAS: Se o texto for um relatório financeiro, extrato ou tabela com múltiplas linhas (ex: Despesas, Receitas, Produtos), e o usuário pedir os itens, VOCÊ DEVE EXTRAIR CADA LINHA INDIVIDUALMENTE como um item separado do JSON. NÃO retorne apenas o "Total" geral a menos que solicitado. Queremos a lista completa de gastos/produtos!
+        4. A raiz do seu JSON DEVE conter OBRIGATORIAMENTE uma única chave chamada "itens", contendo uma LISTA de objetos contendo os campos solicitados. (Exemplo: {{"itens": [{{"data": "...", "descricao": "...", "valor": "..."}}, {{"data": "...", "descricao": "..."}}]}}).
+        5. O formato de resposta OBRIGATÓRIO é um JSON perfeitamente válido contendo apenas o objeto {{"itens": [...]}}. 
+        6. Lembre-se que o site extraído tem formatação rústica (os links aparecem assim: "[Link: http...]"). Extraia urls limpas!
+        7. IMPORTANTE: Leia todo o texto-fonte passado até a última linha antes de dizer que não encontrou nada!
+        8. Se as informações não estiverem no texto ou nenhum item passar no filtro, retorne {{"itens": []}} (lista vazia). Não escreva NADA fora do JSON bruto.
 
         TEXTO-FONTE:
         {text_preview}
