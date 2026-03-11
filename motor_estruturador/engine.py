@@ -40,7 +40,7 @@ class ExtractionEngine:
 
         REGRAS IMPORTANTES DE EXTRAÇÃO E FILTRAGEM:
         1. Baseie-se APENAS no texto-fonte. Não invente informações!
-        2. ATENÇÃO AO FILTRO: Se o usuário pediu por um item específico nas "INSTRUÇÕES DE FILTRO", VOCÊ DEVE OBRIGATORIAMENTE FILTRAR E IGNORAR todos os outros itens.
+        2. ATENÇÃO AO FILTRO: Se o usuário pedir itens específicos nas "INSTRUÇÕES DE FILTRO" (ex: "apenas receitas e despesas"), você OBRIGATORIAMENTE DEVE extrair TODOS os itens solicitados. NUNCA extraia apenas um e ignore o outro! Liste todas as categorias pedidas no mesmo JSON, ignorando apenas o que não foi listado no pedido.
         3. INTELIGÊNCIA DE COLUNAS: O usuário pode digitar pedidos conversacionais ou confusos para os "CAMPOS A EXTRAIR" (ex: "tabela de finanças, total, despesas"). NÃO crie nomes de colunas literais bizarros como "tabela_de_financas" que englobem a tabela inteira! Em vez disso, DEDUZA AS COLUNAS LÓGICAS (ex: "Data", "Descrição", "Valor") que melhor representam o que o usuário quer ver.
         4. EXTRAÇÃO GRANULAR / TABELAS: Se o texto for um relatório financeiro, extrato ou tabela com múltiplas linhas, VOCÊ DEVE EXTRAIR CADA LINHA INDIVIDUALMENTE como um item separado do JSON. NÃO resuma nada! Queremos a lista estrita de itens.
         5. TOTAIS NO FINAL: Após listar as linhas individuais, se houver um "Total" ou "Saldo", inclua ele na lista JSON como se fosse a última linha extraída. Não tente preencher o valor Total em todas as linhas filhas. O total é apenas a última linha.
