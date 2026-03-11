@@ -70,6 +70,15 @@ st.markdown("""
         border-color: rgba(255, 255, 255, 0.1) !important;
         background: rgba(0, 0, 0, 0.2);
     }
+    
+    /* Força rolagem horizontal da tabela de dados quando extrapolar a tela */
+    div[data-testid="stDataFrame"] {
+        overflow-x: auto !important;
+        width: 100% !important;
+    }
+    div[data-testid="stDataFrame"] > div {
+        overflow-x: auto !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -256,9 +265,8 @@ with col2:
         df.fillna("", inplace=True)
         df.replace("None", "", inplace=True)
         
-        # use_container_width como "False" obriga a tabela a gerar uma barra de rolagem lateral 
-        # caso as colunas extraídas (Data, Categoria, etc) sejam maiores que a tela do usuário.
-        st.dataframe(df, use_container_width=False, height=500, width=2000)
+        # use_container_width=True preenche o espaço visual, enquanto o novo CSS força o scroll-x
+        st.dataframe(df, use_container_width=True)
         
         st.divider()
         
