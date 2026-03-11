@@ -208,7 +208,12 @@ class WebExtractor:
                     a_tag.string = f"{txt} [Link: {href}]"
             
             # 3. Extrair texto super limpo apenas do body (ignorando o DOM e as tags HTML)
-            if soup.body:
+            # MEGA OTIMIZAÇÃO: Tentar focar apenas no conteúdo principal pra evitar Cabeçalhos gigantes (que estouram os 12k chars)
+            main_content = soup.find("main") or soup.find("div", id="search") or soup.find("div", role="main") or soup.find("div", id="root-app")
+            
+            if main_content:
+                texto_limpo = main_content.get_text(separator='\n', strip=True)
+            elif soup.body:
                 texto_limpo = soup.body.get_text(separator='\n', strip=True)
             else:
                 texto_limpo = soup.get_text(separator='\n', strip=True)
