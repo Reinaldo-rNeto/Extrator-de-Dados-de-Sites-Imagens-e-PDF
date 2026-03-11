@@ -89,10 +89,20 @@ def extrair_html_cacheado(url: str) -> str:
             
         # ==========================================
         # 🛡️ SISTEMA DE FALLBACK ANTI-BOT (ScrapingBee)
-        # Se o Playwright foi pego pelo Datadome/Cloudflare (retornou Captcha ou negative_traffic)
+        # Se o Playwright foi pego pelo Datadome/Cloudflare (retornou Captcha, negative_traffic ou página em branco)
         # ==========================================
-        if "negative_traffic" in html or "captcha" in html.lower() or "verifique se você é humano" in html.lower():
-            print(f"⚠️ BLOQUEIO DETECTADO NO SITE: {url}. Acionando Proxies Premium (ScrapingBee)...")
+        html_low = html.lower()
+        needs_fallback = (
+            "negative_traffic" in html_low or 
+            "captcha" in html_low or 
+            "verifique se você é humano" in html_low or
+            "403 forbidden" in html_low or
+            "access denied" in html_low or
+            len(html) < 5000 # Páginas de e-commerce sempre têm mais de 50k caracteres de código. Se for menor que 5k, fomos bloqueados silenciosamente.
+        )
+        
+        if needs_fallback:
+            print(f"⚠️ BLOQUEIO DETECTADO NO SITE (ou página muito curta): {url}. Acionando Proxies Premium (ScrapingBee)...")
             api_key = os.getenv("SCRAPINGBEE_API_KEY")
             
             if api_key:

@@ -228,6 +228,9 @@ with col2:
                         else:
                             status.update(label="Busca Finalizada (Nenhum item válido) ⚠️", state="complete")
                             st.warning("A IA rodou, mas nenhum item válido foi encontrado correspondendo aos campos pesquisados no texto extraído.")
+                else:
+                    status.update(label="Conteúdo Invisível ou Bloqueado ❌", state="error")
+                    st.error("O site retornou uma página completamente em branco ou todo o texto visual estava fortemente protegido/escondido. Verifique o link e tente novamente ou ajuste a configuração de bypass.")
 
     if st.session_state.resultados:
         df = pd.DataFrame(st.session_state.resultados)
