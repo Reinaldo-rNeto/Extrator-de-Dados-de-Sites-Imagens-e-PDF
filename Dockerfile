@@ -50,4 +50,5 @@ EXPOSE 7860
 
 # Comando final que a máquina do Render/Hugging Face vai rodar
 # O --server.address=0.0.0.0 garante que o site possa ser acessado pelo IP externo
-CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0"]
+# Desativamos XSRF e CORS porque o proxy reverso do Hugging Face bloqueia o upload de arquivos (AxiosError 403)
+CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0", "--server.enableXsrfProtection=false", "--server.enableCORS=false"]

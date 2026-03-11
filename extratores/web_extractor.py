@@ -219,9 +219,10 @@ class WebExtractor:
             linhas = []
             for text_node in main_content.stripped_strings:
                 node_str = str(text_node).strip()
-                # Ignorar ruídos muito curtos e coisas que poluem (|, -, >, "Em estoque")
-                if len(node_str) > 2 and node_str.lower() not in ["mais opções de compra", "receba até", "frete grátis", "ver opções", "saber mais", "patrocinado", "prime", "em estoque"]:
-                    linhas.append(node_str)
+                # Ignorar ruídos absolutos (|, -, >), mas PRESERVAR números e 'R$' (tamanho curto)
+                if len(node_str) > 0 and node_str not in ['|', '-', '>', '<', '.', ',', ':', ';']:
+                    if node_str.lower() not in ["mais opções de compra", "receba até", "frete grátis", "ver opções", "saber mais", "patrocinado", "prime", "em estoque"]:
+                        linhas.append(node_str)
             
             # Unir tudo e remover blocos gigantes de espaços ou quebras para socar mais coisas em 12k chars
             texto_bruto = ' | '.join(linhas)
