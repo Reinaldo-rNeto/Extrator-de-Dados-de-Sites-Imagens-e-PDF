@@ -41,12 +41,11 @@ class ExtractionEngine:
         REGRAS IMPORTANTES DE EXTRAÇÃO E FILTRAGEM:
         1. Baseie-se APENAS no texto-fonte. Não invente informações!
         2. ATENÇÃO AO FILTRO: Se o usuário pediu por um item específico nas "INSTRUÇÕES DE FILTRO", VOCÊ DEVE OBRIGATORIAMENTE FILTRAR E IGNORAR todos os outros itens.
-        3. EXTRAÇÃO GRANULAR / TABELAS COMPLETA: Se o texto for um relatório financeiro, extrato ou tabela, VOCÊ DEVE EXTRAIR CADA LINHA INDIVIDUALMENTE no JSON. NÃO FAÇA RESUMOS! Copie os dados de cada linha.
-        4. COMPLETEZA DE DADOS: Para cada linha do relatório, extraia TODAS as informações associadas a ela que aparecem na tabela (exemplo: Data, Descrição, Período, Valor), mesmo que o usuário tenha pedido de forma generalizada (ex: "Despesas"). Queremos a linha completa e rica em detalhes!
-        5. TOTAIS NO FINAL: Após listar todas as linhas individuais minuciosamente, se houver uma linha de "Total" ou "Saldo" (Total de Despesas, Total Geral, etc), INSIRA O TOTAL COMO O ÚLTIMO ITEM da sua lista JSON, para que o usuário veja a linha final de soma.
-        6. LIMPEZA DE NÚMEROS: Ao extrair campos monetários, Valores, Preços ou Totais financeiros, escreva APENAS OS NÚMEROS LIMPOS e a pontuação decimal (ex: 2123.00, 10000.00, -150.50). NUNCA escreva palavras, letras ou descrições (como "Total de..." ou "R$") dentro de campos que deveriam ser puramente matemáticos!
-        7. A raiz do seu JSON DEVE conter OBRIGATORIAMENTE uma única chave chamada "itens", contendo uma LISTA de objetos. (Exemplo: {{"itens": [{{"data": "...", "descricao": "...", "valor": "..."}}]}}).
-        8. O formato de resposta OBRIGATÓRIO é um JSON perfeitamente válido contendo apenas o objeto {{"itens": [...]}}. 
+        3. EXTRAÇÃO GRANULAR / TABELAS: Se o texto for um relatório financeiro, extrato ou tabela com múltiplas linhas, VOCÊ DEVE EXTRAIR CADA LINHA INDIVIDUALMENTE como um item separado do JSON. NÃO resuma nada! Queremos a lista estrita de itens.
+        4. TOTAIS NO FINAL: Após listar as linhas individuais, se houver um "Total" ou "Saldo", inclua ele na lista JSON como se fosse a última linha extraída.
+        5. LIMPEZA DE NÚMEROS: Ao extrair Valores monetários, Preços, Porcentagens ou Totais financeiros, converta para número puro da forma mais limpa possível (ex: 2123.00, 10000.00, -150.50). Se a IA for preencher a coluna do Valor, não inclua palavras (como "Total de...") nem símbolos R$. Apenas números.
+        6. A raiz do seu JSON DEVE conter OBRIGATORIAMENTE uma única chave chamada "itens", contendo uma LISTA de objetos contendo os campos solicitados pelo usuário listados acima.
+        7. O formato de resposta OBRIGATÓRIO é um JSON perfeitamente válido contendo apenas o objeto {{"itens": [...]}}. 
         9. Lembre-se que o site extraído tem formatação rústica. Extraia urls limpas!
         10. Se as informações não estiverem no texto, retorne {{"itens": []}}. NUNCA escreva nada fora do JSON bruto.
 
