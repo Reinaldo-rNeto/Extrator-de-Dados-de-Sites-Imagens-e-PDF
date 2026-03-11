@@ -23,8 +23,8 @@ class ExtractionEngine:
         if not hasattr(self, 'client'):
              return {"erro": "API Key do Groq não configurada no arquivo .env"}, False
 
-        # Aumentado para 32k caracteres para maximizar a janela de contexto da Groq API (8K Tokens = ~32K chars)
-        MAX_CHARS = 32000
+        # Limite TÉCNICO estrito para cota Free da Groq (12k Tokens/Minuto = Aprox 20k ~ 24k chars)
+        MAX_CHARS = 20000
         foi_cortado = len(source_text) > MAX_CHARS
         text_preview = source_text[:MAX_CHARS] 
 
