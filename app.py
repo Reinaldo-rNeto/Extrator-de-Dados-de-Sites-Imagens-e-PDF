@@ -189,7 +189,11 @@ with col2:
                     except Exception as e:
                         status.update(label="Falha gravíssima ao acessar site ❌", state="error")
                         st.error(f"Detalhe: {e}")
-                
+                # Mostra o texto bruto na tela para a gente debugar o "Anti-Bot"
+                if texto_bruto:
+                    with st.expander("🛠️ DEBUG: Texto capturado do site (Verifique se é captcha)"):
+                        st.text_area("Primeiros 3000 caracteres:", value=texto_bruto[:3000], height=200)
+
                 # Envia pro Cérebro
                 if texto_bruto:
                     status.update(label="Enviando para o Motor Llama 3 Analisar... 🧠", state="running")
