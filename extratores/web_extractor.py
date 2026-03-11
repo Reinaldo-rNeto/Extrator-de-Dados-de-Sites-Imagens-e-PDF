@@ -212,19 +212,21 @@ class WebExtractor:
             
             # 3. Extrair texto super limpo apenas do body (ignorando o DOM e as tags HTML)
             # MEGA OTIMIZAÇÃO: Tentar focar apenas no conteúdo principal pra evitar Cabeçalhos gigantes (que estouram os 12k chars)
-            main_content = soup.find("main") or soup.find("div", id="search") or soup.find("div", role="main") or soup.find("div", id="root-app")
+            main_content = soup.find("main") or soup.find("div", id="search") or soup.find("div", role="main") or soup.find("div", id="root-app") or soup.body or soup
             
-            if main_content:
-                texto_limpo = main_content.get_text(separator='\n', strip=True)
-            elif soup.body:
-                texto_limpo = soup.body.get_text(separator='\n', strip=True)
-            else:
-                texto_limpo = soup.get_text(separator='\n', strip=True)
+            # 4. Compressão Extrema (Smart Node Extraction)
+            # Em vez de chamar get_text que engole spans com classes sujas, pegamos as strings com join
+            linhas = []
+            for text_node in main_content.stripped_strings:
+                node_str = str(text_node).strip()
+                # Ignorar ruídos muito curtos e coisas que poluem (|, -, >, "Em estoque")
+                if len(node_str) > 2 and node_str.lower() not in ["mais opções de compra", "receba até", "frete grátis", "ver opções", "saber mais", "patrocinado", "prime", "em estoque"]:
+                    linhas.append(node_str)
             
-            # 4. Compressão vertical extrema (remover múltiplas quebras de linhas)
-            # Isso junta as linhas de um mesmo produto fazendo-o caber fácil no limite do LLM
-            linhas = [linha.strip() for linha in texto_limpo.split('\n') if linha.strip()]
-            texto_limpo = '\n'.join(linhas)
+            # Unir tudo e remover blocos gigantes de espaços ou quebras para socar mais coisas em 12k chars
+            texto_bruto = ' | '.join(linhas)
+            # Limpa múltiplos pipes seguidos
+            texto_limpo = re.sub(r'(\s*\|\s*){2,}', ' | ', texto_bruto)
             
             # Retorna o suco condensado da informação
             return texto_limpo
