@@ -40,13 +40,14 @@ class ExtractionEngine:
 
         REGRAS IMPORTANTES DE EXTRAÇÃO E FILTRAGEM:
         1. Baseie-se APENAS no texto-fonte. Não invente informações!
-        2. ATENÇÃO AO FILTRO: Se o usuário pediu por um item específico nas "INSTRUÇÕES DE FILTRO" (exemplo: "apenas TV", "celular", "somente empresas de SP"), VOCÊ DEVE OBRIGATORIAMENTE FILTRAR E IGNORAR todos os outros itens.
-        3. EXTRAÇÃO GRANULAR / TABELAS: Se o texto for um relatório financeiro, extrato ou tabela com múltiplas linhas (ex: Despesas, Receitas, Produtos), e o usuário pedir os itens, VOCÊ DEVE EXTRAIR CADA LINHA INDIVIDUALMENTE como um item separado do JSON. NÃO retorne apenas o "Total" geral a menos que solicitado. Queremos a lista completa de gastos/produtos!
-        4. A raiz do seu JSON DEVE conter OBRIGATORIAMENTE uma única chave chamada "itens", contendo uma LISTA de objetos contendo os campos solicitados. (Exemplo: {{"itens": [{{"data": "...", "descricao": "...", "valor": "..."}}, {{"data": "...", "descricao": "..."}}]}}).
-        5. O formato de resposta OBRIGATÓRIO é um JSON perfeitamente válido contendo apenas o objeto {{"itens": [...]}}. 
-        6. Lembre-se que o site extraído tem formatação rústica (os links aparecem assim: "[Link: http...]"). Extraia urls limpas!
-        7. IMPORTANTE: Leia todo o texto-fonte passado até a última linha antes de dizer que não encontrou nada!
-        8. Se as informações não estiverem no texto ou nenhum item passar no filtro, retorne {{"itens": []}} (lista vazia). Não escreva NADA fora do JSON bruto.
+        2. ATENÇÃO AO FILTRO: Se o usuário pediu por um item específico nas "INSTRUÇÕES DE FILTRO", VOCÊ DEVE OBRIGATORIAMENTE FILTRAR E IGNORAR todos os outros itens.
+        3. EXTRAÇÃO GRANULAR / TABELAS COMPLETA: Se o texto for um relatório financeiro, extrato ou tabela, VOCÊ DEVE EXTRAIR CADA LINHA INDIVIDUALMENTE no JSON. NÃO FAÇA RESUMOS! Copie os dados de cada linha.
+        4. COMPLETEZA DE DADOS: Para cada linha do relatório, extraia TODAS as informações associadas a ela que aparecem na tabela (exemplo: Data, Descrição, Período, Valor), mesmo que o usuário tenha pedido de forma generalizada (ex: "Despesas"). Queremos a linha completa e rica em detalhes!
+        5. TOTAIS NO FINAL: Após listar todas as linhas individuais minuciosamente, se houver uma linha de "Total" ou "Saldo" (Total de Despesas, Total Geral, etc), INSIRA O TOTAL COMO O ÚLTIMO ITEM da sua lista JSON, para que o usuário veja a linha final de soma.
+        6. A raiz do seu JSON DEVE conter OBRIGATORIAMENTE uma única chave chamada "itens", contendo uma LISTA de objetos. (Exemplo: {{"itens": [{{"data": "...", "descricao": "...", "valor": "..."}}]}}).
+        7. O formato de resposta OBRIGATÓRIO é um JSON perfeitamente válido contendo apenas o objeto {{"itens": [...]}}. 
+        8. Lembre-se que o site extraído tem formatação rústica. Extraia urls limpas!
+        9. Se as informações não estiverem no texto, retorne {{"itens": []}}. NUNCA escreva nada fora do JSON bruto.
 
         TEXTO-FONTE:
         {text_preview}
