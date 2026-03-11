@@ -1,9 +1,6 @@
 import os
 import json
-from dotenv import load_dotenv
 from groq import Groq
-
-load_dotenv()
 
 class ExtractionEngine:
     """
