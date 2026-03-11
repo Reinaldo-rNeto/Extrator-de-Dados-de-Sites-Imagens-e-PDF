@@ -7,6 +7,8 @@ import re
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 from youtube_transcript_api import YouTubeTranscriptApi
+import requests
+import os
 
 # Correção vital para rodar Playwright em Threads do Streamlit no Windows
 if sys.platform == "win32":
@@ -18,9 +20,8 @@ def extrair_html_cacheado(url: str) -> str:
     Função auxiliar cacheada para não baixar a mesma URL várias vezes na mesma hora
     """
     # ==========================================
-    # 🕸️ MODO PADRÃO: PLAYWRIGHT (Scraping Visual)
-    # ==========================================
     try:
+        html = ""
         with sync_playwright() as p:
             # ATUALIZAÇÃO ANTI-BOT: Mudando de Chromium para Firefox
             # O Firefox headless é nativamente menos rastreado por WAFs como Datadome e Cloudflare
@@ -85,7 +86,34 @@ def extrair_html_cacheado(url: str) -> str:
 
             html = page.content()
             browser.close()
-            return html
+            
+        # ==========================================
+        # 🛡️ SISTEMA DE FALLBACK ANTI-BOT (ScrapingBee)
+        # Se o Playwright foi pego pelo Datadome/Cloudflare (retornou Captcha ou negative_traffic)
+        # ==========================================
+        if "negative_traffic" in html or "captcha" in html.lower() or "verifique se você é humano" in html.lower():
+            print(f"⚠️ BLOQUEIO DETECTADO NO SITE: {url}. Acionando Proxies Premium (ScrapingBee)...")
+            api_key = os.getenv("SCRAPINGBEE_API_KEY")
+            
+            if api_key:
+                response = requests.get(
+                    url="https://app.scrapingbee.com/api/v1/",
+                    params={
+                        "api_key": api_key,
+                        "url": url,
+                        "render_js": "true",
+                        "premium_proxy": "true", # Essencial para Amazon/Mercado Livre
+                    }
+                )
+                if response.status_code == 200:
+                    print("✅ Falback ScrapingBee Vencedor!")
+                    html = response.text
+                else:
+                    print(f"❌ ScrapingBee Falhou: {response.status_code} - {response.text}")
+            else:
+                print("❌ Chave SCRAPINGBEE_API_KEY não encontrada no .env. Fallback ignorado.")
+
+        return html
     except Exception as e:
         tb = traceback.format_exc()
         raise Exception(f"Erro ao acessar {url}. Motivo técnico: {tb}")
