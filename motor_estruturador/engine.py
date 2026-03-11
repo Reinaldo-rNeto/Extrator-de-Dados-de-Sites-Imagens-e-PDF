@@ -23,8 +23,10 @@ class ExtractionEngine:
         if not hasattr(self, 'client'):
              return {"erro": "API Key do Groq não configurada no arquivo .env"}, False
 
-        # Limite TÉCNICO estrito para cota Free da Groq (12k Tokens/Minuto = Aprox 20k ~ 24k chars)
-        MAX_CHARS = 20000
+        # Limite TÉCNICO estrito para cota Free da Groq (12k Tokens/Minuto)
+        # Atenção: HTML de e-commerce é denso (poucos espaços). 1 char pode equivaler a quase 1 token.
+        # Estamos travando em 12.000 chars para garantir matematicamente que nunca ultrapasse 12k Tokens.
+        MAX_CHARS = 12000
         foi_cortado = len(source_text) > MAX_CHARS
         text_preview = source_text[:MAX_CHARS] 
 
