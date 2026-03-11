@@ -45,9 +45,9 @@ RUN playwright install-deps chromium
 # Copia todo o resto do código da aplicação pra dentro do container
 COPY . .
 
-# Expõe a porta padrão que o Streamlit usa E que o Render vai ler
-EXPOSE 8501
+# Expõe a porta padrão do Hugging Face Spaces (Obrigatório ser a 7860)
+EXPOSE 7860
 
-# Comando final que a máquina do Render vai rodar pra inicializar o Streamlit sem erros
-# O --server.address=0.0.0.0 garante que o site possa ser acessado pelo IP externo do Render
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Comando final que a máquina do Render/Hugging Face vai rodar
+# O --server.address=0.0.0.0 garante que o site possa ser acessado pelo IP externo
+CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0"]
