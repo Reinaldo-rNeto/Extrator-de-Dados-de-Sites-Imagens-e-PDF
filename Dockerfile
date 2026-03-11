@@ -38,9 +38,9 @@ COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Instala nativamente os navegadores do Playwright que o web_extractor vai usar (Chromium apenas)
-RUN playwright install chromium
-RUN playwright install-deps chromium
+# Instala nativamente os navegadores do Playwright que o web_extractor vai usar (Firefox apenas)
+RUN playwright install firefox
+RUN playwright install-deps firefox
 
 # Copia todo o resto do código da aplicação pra dentro do container
 COPY . .
