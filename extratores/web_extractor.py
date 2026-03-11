@@ -25,16 +25,29 @@ def extrair_html_cacheado(url: str) -> str:
             # Navegador invisível carregando o site de forma furtiva (stealth)
             browser = p.chromium.launch(
                 headless=True, 
-                args=["--disable-blink-features=AutomationControlled", "--no-sandbox"]
+                args=[
+                    "--disable-blink-features=AutomationControlled", 
+                    "--no-sandbox",
+                    "--disable-dev-shm-usage", # Evita o crash de memória compartilhada no Docker do Hugging Face
+                    "--disable-gpu",           # Essencial para servidores Linux na nuvem
+                    "--window-size=1920,1080"
+                ]
             )
             
             # Contexto "disfarçado" para evitar bloqueios de site que rejeitam robôs diretos
             context = browser.new_context(
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                viewport={"width": 1920, "height": 1080}
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                viewport={"width": 1920, "height": 1080},
+                extra_http_headers={
+                    "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"
+                }
             )
             
             page = context.new_page()
+            
+            # Injeta o disfarce ANTES da página carregar (Bypassa Cloudflare/Amazon/Shopee WAF)
+            page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+            
             # Aumentando limite de tempo (timeout robusto de 45s)
             page.set_default_timeout(45000)
             
@@ -70,14 +83,8 @@ def extrair_html_cacheado(url: str) -> str:
                 time.sleep(1) # Extra wait p/ dom processar novas tags
             except Exception as e:
                 print(f"Aviso na rolagem JavaScript: {e}")
-            
-            # Desativa javascript que denuncia o scraper
-            try:
-                page.evaluate("navigator.webdriver = false")
-            except:
-                pass
-            
             # Captura todo o HTML no seu formato final processado
+
             html = page.content()
             browser.close()
             return html
