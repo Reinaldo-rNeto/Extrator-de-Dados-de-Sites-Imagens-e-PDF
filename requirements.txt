@@ -8,3 +8,4 @@ youtube-transcript-api
 pytesseract
 pillow
 python-dotenv
+requests
