@@ -23,8 +23,8 @@ class ExtractionEngine:
         if not hasattr(self, 'client'):
              return {"erro": "API Key do Groq não configurada no arquivo .env"}, False
 
-        # Aumentado para 25k caracteres para caber na cota Free da Groq (12000 Tokens/Min)
-        MAX_CHARS = 25000
+        # Aumentado para 32k caracteres para maximizar a janela de contexto da Groq API (8K Tokens = ~32K chars)
+        MAX_CHARS = 32000
         foi_cortado = len(source_text) > MAX_CHARS
         text_preview = source_text[:MAX_CHARS] 
 
@@ -38,10 +38,12 @@ class ExtractionEngine:
 
         REGRAS IMPORTANTES DE EXTRAÇÃO E FILTRAGEM:
         1. Baseie-se APENAS no texto-fonte. Não invente informações!
-        2. ATENÇÃO AO FILTRO: Se o usuário pediu por um item específico nas "INSTRUÇÕES DE FILTRO" (exemplo: "apenas TV", "apenas tênis", "somente empresas de SP"), VOCÊ DEVE OBRIGATORIAMENTE FILTRAR E IGNORAR todos os outros itens da página que não sejam do tipo solicitado. Use interpretação semântica (uma "televisão" é uma "TV").
-        3. Se houver vários itens correspondentes na página (ex: dezenas de produtos numa loja), a raiz do seu JSON DEVE conter uma única chave chamada "itens", contendo uma LISTA de objetos. (Exemplo: {{"itens": [{{"nome": "A", "preco": "10"}}, {{"nome": "B", "preco": "20"}}]}}).
+        2. ATENÇÃO AO FILTRO: Se o usuário pediu por um item específico nas "INSTRUÇÕES DE FILTRO" (exemplo: "apenas TV", "celular", "somente empresas de SP"), VOCÊ DEVE OBRIGATORIAMENTE FILTRAR E IGNORAR todos os outros itens da página que não sejam do tipo solicitado. Use inteligência para abstrair (uma "televisão" é uma "TV", "smartphone" é "celular").
+        3. Se houver vários itens correspondentes na página, a raiz do seu JSON DEVE conter uma única chave chamada "itens", contendo uma LISTA de objetos. (Exemplo: {{"itens": [{{"nome": "A", "preco": "10", "link": "http..."}}, {{"nome": "B", "preco": "20"}}]}}).
         4. O formato de resposta OBRIGATÓRIO é um JSON perfeitamente válido contendo apenas o objeto {{"itens": [...]}}. 
-        5. Se as informações não estiverem no texto ou nenhum item passar no filtro do usuário, retorne estritamente {{"itens": []}} (lista vazia). Não escreva absolutamente NADA fora do JSON bruto.
+        5. Lembre-se que o site extraído tem formatação rústica (os links aparecem assim: "[Link: http...]"). Extraia urls limpas!
+        6. IMPORTANTE: Leia todo o texto-fonte passado até a última linha antes de dizer que não encontrou nada!
+        7. Se as informações não estiverem no texto ou nenhum item passar no filtro do usuário apóes a LEITURA TOTAL, retorne estritamente {{"itens": []}} (lista vazia). Não escreva NADA fora do JSON bruto.
 
         TEXTO-FONTE:
         {text_preview}
