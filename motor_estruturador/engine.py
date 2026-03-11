@@ -44,10 +44,11 @@ class ExtractionEngine:
         3. EXTRAÇÃO GRANULAR / TABELAS COMPLETA: Se o texto for um relatório financeiro, extrato ou tabela, VOCÊ DEVE EXTRAIR CADA LINHA INDIVIDUALMENTE no JSON. NÃO FAÇA RESUMOS! Copie os dados de cada linha.
         4. COMPLETEZA DE DADOS: Para cada linha do relatório, extraia TODAS as informações associadas a ela que aparecem na tabela (exemplo: Data, Descrição, Período, Valor), mesmo que o usuário tenha pedido de forma generalizada (ex: "Despesas"). Queremos a linha completa e rica em detalhes!
         5. TOTAIS NO FINAL: Após listar todas as linhas individuais minuciosamente, se houver uma linha de "Total" ou "Saldo" (Total de Despesas, Total Geral, etc), INSIRA O TOTAL COMO O ÚLTIMO ITEM da sua lista JSON, para que o usuário veja a linha final de soma.
-        6. A raiz do seu JSON DEVE conter OBRIGATORIAMENTE uma única chave chamada "itens", contendo uma LISTA de objetos. (Exemplo: {{"itens": [{{"data": "...", "descricao": "...", "valor": "..."}}]}}).
-        7. O formato de resposta OBRIGATÓRIO é um JSON perfeitamente válido contendo apenas o objeto {{"itens": [...]}}. 
-        8. Lembre-se que o site extraído tem formatação rústica. Extraia urls limpas!
-        9. Se as informações não estiverem no texto, retorne {{"itens": []}}. NUNCA escreva nada fora do JSON bruto.
+        6. LIMPEZA DE NÚMEROS: Ao extrair campos monetários, Valores, Preços ou Totais financeiros, escreva APENAS OS NÚMEROS LIMPOS e a pontuação decimal (ex: 2123.00, 10000.00, -150.50). NUNCA escreva palavras, letras ou descrições (como "Total de..." ou "R$") dentro de campos que deveriam ser puramente matemáticos!
+        7. A raiz do seu JSON DEVE conter OBRIGATORIAMENTE uma única chave chamada "itens", contendo uma LISTA de objetos. (Exemplo: {{"itens": [{{"data": "...", "descricao": "...", "valor": "..."}}]}}).
+        8. O formato de resposta OBRIGATÓRIO é um JSON perfeitamente válido contendo apenas o objeto {{"itens": [...]}}. 
+        9. Lembre-se que o site extraído tem formatação rústica. Extraia urls limpas!
+        10. Se as informações não estiverem no texto, retorne {{"itens": []}}. NUNCA escreva nada fora do JSON bruto.
 
         TEXTO-FONTE:
         {text_preview}
