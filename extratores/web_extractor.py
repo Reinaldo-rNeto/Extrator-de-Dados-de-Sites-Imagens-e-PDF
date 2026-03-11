@@ -203,9 +203,12 @@ class WebExtractor:
             for a_tag in soup.find_all("a", href=True):
                 txt = a_tag.get_text(strip=True)
                 href = a_tag["href"]
-                # Ignorar links inúteis ou vazios
+                # Ignorar links inúteis ou relatórios javascript
                 if txt and href and not href.startswith("javascript:"):
-                    a_tag.string = f"{txt} [Link: {href}]"
+                    # URL REDUCTION OTIMIZATION: E-commerces (Amazon) usam links com 800+ caracteres de tracking. 
+                    # Isso enche nossos 12.000 tokens muito rápido. Vamos arrancar as Queries!
+                    clean_href = href.split('?')[0].split('/ref=')[0] 
+                    a_tag.string = f"{txt} [Link: {clean_href}]"
             
             # 3. Extrair texto super limpo apenas do body (ignorando o DOM e as tags HTML)
             # MEGA OTIMIZAÇÃO: Tentar focar apenas no conteúdo principal pra evitar Cabeçalhos gigantes (que estouram os 12k chars)
