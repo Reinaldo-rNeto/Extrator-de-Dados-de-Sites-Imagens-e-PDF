@@ -215,7 +215,8 @@ with col2:
                     
                     if isinstance(resultado, dict) and "erro" in resultado:
                         status.update(label="Falha na Inteligência Artificial ❌", state="error")
-                        st.error(resultado["erro"])
+                        st.error(resultado["erro"])  # Mostra dentro
+                        st.session_state.ui_erro = resultado["erro"] # Salva pra mostrar fora
                     else:
                         status.update(label="Montando Tabela de Resultados... 📊", state="running")
                         # O LLM agora é forçado a retornar no formato {"itens": [...]}
@@ -242,6 +243,11 @@ with col2:
                 else:
                     status.update(label="Conteúdo Invisível ou Bloqueado ❌", state="error")
                     st.error("O site retornou uma página completamente em branco ou todo o texto visual estava fortemente protegido/escondido. Verifique o link e tente novamente ou ajuste a configuração de bypass.")
+
+    # Mostra um alerta de erro em CAIXA ALTA gigante fora do expansor se houver
+    if getattr(st.session_state, 'ui_erro', None):
+        st.error(f"🚨 **DETALHE DO ERRO:** {st.session_state.ui_erro}")
+        st.session_state.ui_erro = None
 
     if st.session_state.resultados:
         df = pd.DataFrame(st.session_state.resultados)

@@ -31,9 +31,12 @@ class PDFExtractor:
                     # Ele mantém os espaços e tabulações entre a "Descrição" e o "Valor" nas colunas.
                     texto_pagina = page.extract_text(layout=True)
                     if texto_pagina:
-                        # Otimização de Memória: Troca grandes vácuos de espaço por apenas 3 espaços.
-                        # Isso mantém o visual de colunas para a IA sem estourar o limite de Tokens (12k).
-                        texto_pagina = re.sub(r' {4,}', '   ', texto_pagina)
+                        # Otimização Cavalar de Memória (Tokens):
+                        # Tabelas financeiras usam dezenas de espaços em branco para alinhar os números à direita.
+                        # O Tokenizer da IA contabiliza isso como puro lixo, comendo a cota gratuita.
+                        # Trocar grandes vácuos de espaço por um Pipe " | " mantém a divisão de colunas mas usa apenas 1 token.
+                        texto_pagina = re.sub(r' {3,}', ' | ', texto_pagina)
+                        texto_pagina = re.sub(r'\n\s*\n', '\n', texto_pagina) # Remove linhas em branco extras
                         texto_completo.append(texto_pagina)
             
             return "\n".join(texto_completo)
